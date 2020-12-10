@@ -25,10 +25,12 @@ public class BaseUnit {
     public BaseUnit() {
     }
 
-    public BaseUnit(int age,
+    public BaseUnit(int id,
+                    int age,
                     String name,
                     String surname,
                     String email) {
+        this.id = id;
         this.age = age;
         this.name = name;
         this.surname = surname;

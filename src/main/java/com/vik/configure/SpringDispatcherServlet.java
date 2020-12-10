@@ -1,10 +1,13 @@
 package com.vik.configure;
 
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 
 public class SpringDispatcherServlet extends AbstractAnnotationConfigDispatcherServletInitializer {
 
@@ -15,7 +18,7 @@ public class SpringDispatcherServlet extends AbstractAnnotationConfigDispatcherS
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{SpringConfig.class};
+        return new Class[]{ApplicationContextConfig.class};
     }
 
     @Override

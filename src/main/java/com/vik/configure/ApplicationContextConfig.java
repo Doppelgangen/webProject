@@ -15,11 +15,12 @@ import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 @Configuration
 @ComponentScan("com.vik")
 @EnableWebMvc
-public class SpringConfig implements WebMvcConfigurer {
+public class ApplicationContextConfig implements WebMvcConfigurer {
+
     private final ApplicationContext context;
 
     @Autowired
-    public SpringConfig(ApplicationContext context) {
+    public ApplicationContextConfig(ApplicationContext context) {
         this.context = context;
     }
 
