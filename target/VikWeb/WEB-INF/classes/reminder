@@ -1,0 +1,10 @@
+Basis: Spring MVC
+and Spring Boot
+Model view: Thymeleaf
+DB connection: Postgres
+
+Do I really need both MVC and BOOT?
+How should I start app if I have Tomcat server AND application properties?
+Now I've just decided to split in two controllers: one is MVC the other is Boot
+
+TODO: set redirect if no unit with such ID
