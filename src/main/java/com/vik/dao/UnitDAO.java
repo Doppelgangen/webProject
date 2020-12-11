@@ -1,9 +1,6 @@
 package com.vik.dao;
 
-import com.vik.mapper.BaseUnitMapper;
 import com.vik.model.BaseUnit;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
@@ -11,65 +8,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@PropertySource("classpath:datasource-cfg.properties")
 public class UnitDAO {
 
-    private static String URL = "spring.datasource.url";
-    private static String USERNAME = "spring.datasource.username";
-    private static String PASSWORD = "spring.datasource.password";
-
-    private static Connection connection;
-
-    static {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    /*//imitation of primary key for DB
-    int id=0;
-
-    //Basic presentation of array-database
-    List<BaseUnit> baseUnits = new ArrayList<>();
-    {
-        baseUnits.add(new BaseUnit(id++, 4,"John","Zuck","jozz@mail.com"));
-        baseUnits.add(new BaseUnit(id++, 29,"Jane","Morgen","jm@gmail.com"));
-        baseUnits.add(new BaseUnit(id++, 33,"Lily","Doe","lild@yahoo.com"));
-    }*/
 
     public UnitDAO() {
     }
 
+
+    //Saves all of units into array list
+    //Clears list each time when GET index page (for if changes made into database from outside)
     public List<BaseUnit> index(){
         List<BaseUnit> baseUnitList = new ArrayList<>();
-
-        try {
-            Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM units";
-            ResultSet resultSet = statement.executeQuery(SQL);
+        if (baseUnitList.isEmpty()) {
+            try {
+                Statement statement = DataSource.getConnection().createStatement();
+                String SQL = "SELECT * FROM units";
+                ResultSet resultSet = statement.executeQuery(SQL);
 //            baseUnitList.add(new BaseUnitMapper().mapRow(resultSet,1));
 
-            while(resultSet.next()) {
-                BaseUnit baseUnit = new BaseUnit();
+                while (resultSet.next()) {
+                    BaseUnit baseUnit = new BaseUnit();
 
-                baseUnit.setId(resultSet.getInt("id"));
-                baseUnit.setAge(resultSet.getInt("age"));
-                baseUnit.setName(resultSet.getString("name"));
-                baseUnit.setSurname(resultSet.getString("surname"));
-                baseUnit.setEmail(resultSet.getString("email"));
+                    baseUnit.setId(resultSet.getInt("id"));
+                    baseUnit.setAge(resultSet.getInt("age"));
+                    baseUnit.setName(resultSet.getString("name"));
+                    baseUnit.setSurname(resultSet.getString("surname"));
+                    baseUnit.setEmail(resultSet.getString("email"));
 
-                baseUnitList.add(baseUnit);
+                    baseUnitList.add(baseUnit);
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
 
         return baseUnitList;
@@ -78,43 +48,67 @@ public class UnitDAO {
 
     //Returns unit with {id}
     public BaseUnit show(int id){
-     /*   BaseUnit temp = null;
-        for (BaseUnit buffer:baseUnits) {
-            if (buffer.getId() == id)
-                temp = buffer;
+        BaseUnit baseUnit = new BaseUnit();
+
+        try {
+            Statement statement = DataSource.getConnection().createStatement();
+            String SQL = "SELECT * FROM units WHERE id =" + id;
+            ResultSet resultSet = statement.executeQuery(SQL);
+            System.out.println(SQL);
+
+            resultSet.next();
+            baseUnit.setId(resultSet.getInt("id"));
+            baseUnit.setAge(resultSet.getInt("age"));
+            baseUnit.setName(resultSet.getString("name"));
+            baseUnit.setSurname(resultSet.getString("surname"));
+            baseUnit.setEmail(resultSet.getString("email"));
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
-        return temp;*/
-        return null;
+        if (baseUnit.getId() == 0)
+            baseUnit = null;
+        return baseUnit;
     }
 
-    //Saving new Unit to array(later database)
+    //Saving new unit database
     public void save(BaseUnit baseUnit){
-     /*   baseUnit.setId(id++);
-        baseUnits.add(baseUnit);*/
+        try {
+            Statement statement = DataSource.getConnection().createStatement();
+            String SQL = String.format(
+                    "INSERT INTO units (age, name, surname, email) VALUES (%d,'%s','%s','%s');",
+                    baseUnit.getAge(),baseUnit.getName(),baseUnit.getSurname(),baseUnit.getEmail());
+            statement.executeQuery(SQL);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     //Updating info of Unit with {id}
     //If edit came with wrong {id} do nothing
     public void update(int id, BaseUnit baseUnit){
-    /*    BaseUnit temp = null;
-        for (BaseUnit buffer:baseUnits) {
-            if (buffer.getId() == id)
-                temp = buffer;
-        }
-        if (temp == null)
+        if (id == 0)
             return;
-        temp.setName(baseUnit.getName());
-        temp.setSurname(baseUnit.getSurname());
-        temp.setAge(baseUnit.getAge());
-        temp.setEmail(baseUnit.getEmail());*/
+        try {
+            Statement statement = DataSource.getConnection().createStatement();
+            String SQL = String.format(
+                    "UPDATE units SET age = %d, name = '%s', surname = '%s', email = '%s' WHERE id = %d",
+                    baseUnit.getAge(), baseUnit.getName(), baseUnit.getSurname(), baseUnit.getEmail(), id);
+            statement.executeQuery(SQL);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
-    public void delete(int id){/*
-        for (BaseUnit buffer : baseUnits){
-          if (buffer.getId() == id) {
-              baseUnits.remove(buffer);
-              return;
-          }
-        }*/
+    //Delete unit with {id} from database
+    public void delete(int id){
+        try {
+            Statement statement = DataSource.getConnection().createStatement();
+            String SQL = String.format("DELETE FROM units WHERE id = %d", id);
+            statement.executeQuery(SQL);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 }
