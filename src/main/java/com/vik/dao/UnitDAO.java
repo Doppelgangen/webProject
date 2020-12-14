@@ -51,10 +51,10 @@ public class UnitDAO {
         BaseUnit baseUnit = new BaseUnit();
 
         try {
-            Statement statement = DataSource.getConnection().createStatement();
-            String SQL = "SELECT * FROM units WHERE id =" + id;
-            ResultSet resultSet = statement.executeQuery(SQL);
-            System.out.println(SQL);
+            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
+                    "SELECT * FROM units WHERE id =?");
+            preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             resultSet.next();
             baseUnit.setId(resultSet.getInt("id"));
@@ -74,15 +74,17 @@ public class UnitDAO {
     //Saving new unit database
     public void save(BaseUnit baseUnit){
         try {
-            Statement statement = DataSource.getConnection().createStatement();
-            String SQL = String.format(
-                    "INSERT INTO units (age, name, surname, email) VALUES (%d,'%s','%s','%s');",
-                    baseUnit.getAge(),baseUnit.getName(),baseUnit.getSurname(),baseUnit.getEmail());
-            statement.executeQuery(SQL);
+            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
+                    "INSERT INTO units (age, name, surname, email) VALUES (?, ?, ?, ?)");
+            preparedStatement.setInt(1, baseUnit.getAge());
+            preparedStatement.setString(2, baseUnit.getName());
+            preparedStatement.setString(3, baseUnit.getSurname());
+            preparedStatement.setString(4, baseUnit.getEmail());
+
+            preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
     }
 
     //Updating info of Unit with {id}
@@ -91,11 +93,15 @@ public class UnitDAO {
         if (id == 0)
             return;
         try {
-            Statement statement = DataSource.getConnection().createStatement();
-            String SQL = String.format(
-                    "UPDATE units SET age = %d, name = '%s', surname = '%s', email = '%s' WHERE id = %d",
-                    baseUnit.getAge(), baseUnit.getName(), baseUnit.getSurname(), baseUnit.getEmail(), id);
-            statement.executeQuery(SQL);
+            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
+                    "UPDATE units SET age = ?, name = ?, surname = ?, email = ? WHERE id = ?");
+            preparedStatement.setInt(1, baseUnit.getAge());
+            preparedStatement.setString(2, baseUnit.getName());
+            preparedStatement.setString(3, baseUnit.getSurname());
+            preparedStatement.setString(4, baseUnit.getEmail());
+            preparedStatement.setInt(5, id);
+
+            preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -104,9 +110,11 @@ public class UnitDAO {
     //Delete unit with {id} from database
     public void delete(int id){
         try {
-            Statement statement = DataSource.getConnection().createStatement();
-            String SQL = String.format("DELETE FROM units WHERE id = %d", id);
-            statement.executeQuery(SQL);
+            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
+                    "DELETE FROM units WHERE id = ?");
+            preparedStatement.setInt(1, id);
+
+            preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
