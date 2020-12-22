@@ -4,8 +4,7 @@ Model view: Thymeleaf
 
 DB connection: Postgres
 
-Database name: webdb
-
+Database name: postgres
 
 Table: CREATE TABLE units (id SERIAL PRIMARY KEY, age INT NOT NULL, 
 	name VARCHAR(50) NOT NULL, surname VARCHAR(50) NOT NULL, email VARCHAR(50));

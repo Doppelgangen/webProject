@@ -23,9 +23,14 @@ public class UnitController {
 
     @GetMapping
     public String index(Model model){
-
-        model.addAttribute("units",unitDAO.index());
-        return "/units/index";
+        try {
+            if (unitDAO.index().isEmpty())
+                return "redirect:/units/emptyTable";
+            model.addAttribute("units",unitDAO.index());
+            return "/units/index";
+            } catch (NullPointerException e) {
+                return "redirect:/units/noData";
+            }
     }
 
     @GetMapping("/{id}")
@@ -60,6 +65,16 @@ public class UnitController {
     @GetMapping("/noUnit")
     public String wrongId(){
         return "/units/noUnit";
+    }
+
+    @GetMapping("/noData")
+    public String wrongDatabase(){
+        return "/units/noData";
+    }
+
+    @GetMapping("/emptyTable")
+    public String wrongTable(){
+        return "/units/emptyTable";
     }
 
     @PatchMapping("/{id}")

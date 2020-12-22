@@ -24,7 +24,6 @@ public class UnitDAO {
                 Statement statement = DataSource.getConnection().createStatement();
                 String SQL = "SELECT * FROM units";
                 ResultSet resultSet = statement.executeQuery(SQL);
-//            baseUnitList.add(new BaseUnitMapper().mapRow(resultSet,1));
 
                 while (resultSet.next()) {
                     BaseUnit baseUnit = new BaseUnit();
@@ -41,7 +40,6 @@ public class UnitDAO {
                 throwables.printStackTrace();
             }
         }
-
         return baseUnitList;
     }
 
