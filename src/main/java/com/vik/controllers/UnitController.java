@@ -1,7 +1,7 @@
 package com.vik.controllers;
 
 import com.vik.dao.UnitDAO;
-import com.vik.model.BaseUnit;
+import com.vik.model.Unit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,15 +42,15 @@ public class UnitController {
     }
 
     @GetMapping("/new")
-    public String newUnit(@ModelAttribute("unit") BaseUnit baseUnit){
+    public String newUnit(@ModelAttribute("unit") Unit unit){
         return "units/new";
     }
 
     @PostMapping
-    public String create(@ModelAttribute("unit") @Valid BaseUnit baseUnit, BindingResult bindingResult){
+    public String create(@ModelAttribute("unit") @Valid Unit unit, BindingResult bindingResult){
         if (bindingResult.hasErrors())
             return "units/new";
-        unitDAO.save(baseUnit);
+        unitDAO.save(unit);
         return "redirect:/units";
     }
 
@@ -78,11 +78,11 @@ public class UnitController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute("unit") @Valid BaseUnit baseUnit, BindingResult bindingResult,
+    public String update(@ModelAttribute("unit") @Valid Unit unit, BindingResult bindingResult,
                          @PathVariable("id") int id){
         if (bindingResult.hasErrors())
             return "units/edit";
-        unitDAO.update(id, baseUnit);
+        unitDAO.update(id, unit);
         return "redirect:/units/" + id;
     }
 

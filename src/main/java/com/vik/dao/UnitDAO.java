@@ -1,120 +1,51 @@
 package com.vik.dao;
 
-import com.vik.model.BaseUnit;
+import com.vik.mapper.UnitMapper;
+import com.vik.model.Unit;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class UnitDAO {
 
+    private final JdbcTemplate jdbcTemplate;
 
-    public UnitDAO() {
+    @Autowired
+    public UnitDAO(JdbcTemplate jdbcTemplate){
+        this.jdbcTemplate = jdbcTemplate;
     }
-
 
     //Saves all of units into array list
     //Clears list each time when GET index page (for if changes made into database from outside)
-    public List<BaseUnit> index(){
-        List<BaseUnit> baseUnitList = new ArrayList<>();
-        if (baseUnitList.isEmpty()) {
-            try {
-                Statement statement = DataSource.getConnection().createStatement();
-                String SQL = "SELECT * FROM units";
-                ResultSet resultSet = statement.executeQuery(SQL);
-
-                while (resultSet.next()) {
-                    BaseUnit baseUnit = new BaseUnit();
-
-                    baseUnit.setId(resultSet.getInt("id"));
-                    baseUnit.setAge(resultSet.getInt("age"));
-                    baseUnit.setName(resultSet.getString("name"));
-                    baseUnit.setSurname(resultSet.getString("surname"));
-                    baseUnit.setEmail(resultSet.getString("email"));
-
-                    baseUnitList.add(baseUnit);
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
-        return baseUnitList;
+    public List<Unit> index(){
+        return jdbcTemplate.query("SELECT * FROM units", new UnitMapper());
     }
 
 
     //Returns unit with {id}
-    public BaseUnit show(int id){
-        BaseUnit baseUnit = new BaseUnit();
-
-        try {
-            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
-                    "SELECT * FROM units WHERE id =?");
-            preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            resultSet.next();
-            baseUnit.setId(resultSet.getInt("id"));
-            baseUnit.setAge(resultSet.getInt("age"));
-            baseUnit.setName(resultSet.getString("name"));
-            baseUnit.setSurname(resultSet.getString("surname"));
-            baseUnit.setEmail(resultSet.getString("email"));
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-        if (baseUnit.getId() == 0)
-            baseUnit = null;
-        return baseUnit;
+    public Unit show(int id){
+        return jdbcTemplate.query("SELECT * FROM units WHERE id = ?", new Object[]{id}, new UnitMapper())
+                .stream().findAny().orElse(null);
     }
 
     //Saving new unit database
-    public void save(BaseUnit baseUnit){
-        try {
-            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
-                    "INSERT INTO units (age, name, surname, email) VALUES (?, ?, ?, ?)");
-            preparedStatement.setInt(1, baseUnit.getAge());
-            preparedStatement.setString(2, baseUnit.getName());
-            preparedStatement.setString(3, baseUnit.getSurname());
-            preparedStatement.setString(4, baseUnit.getEmail());
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public void save(Unit unit){
+        jdbcTemplate.update("INSERT INTO units (age, name, surname, email) VALUES (?, ?, ?, ?)",
+                unit.getAge(), unit.getName(), unit.getSurname(), unit.getEmail());
     }
 
     //Updating info of Unit with {id}
     //If edit came with wrong {id} do nothing
-    public void update(int id, BaseUnit baseUnit){
-        if (id == 0)
-            return;
-        try {
-            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
-                    "UPDATE units SET age = ?, name = ?, surname = ?, email = ? WHERE id = ?");
-            preparedStatement.setInt(1, baseUnit.getAge());
-            preparedStatement.setString(2, baseUnit.getName());
-            preparedStatement.setString(3, baseUnit.getSurname());
-            preparedStatement.setString(4, baseUnit.getEmail());
-            preparedStatement.setInt(5, id);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public void update(int id, Unit unit){
+        jdbcTemplate.update("UPDATE units SET age = ?, name = ?, surname = ?, email = ? WHERE id = ?",
+                unit.getAge(), unit.getName(), unit.getSurname(), unit.getEmail(), id);
     }
 
     //Delete unit with {id} from database
     public void delete(int id){
-        try {
-            PreparedStatement preparedStatement = DataSource.getConnection().prepareStatement(
-                    "DELETE FROM units WHERE id = ?");
-            preparedStatement.setInt(1, id);
-
-            preparedStatement.executeUpdate();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        jdbcTemplate.update("DELETE FROM units WHERE id = ?", id);
     }
 }

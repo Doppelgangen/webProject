@@ -2,7 +2,7 @@ package com.vik.model;
 
 import javax.validation.constraints.*;
 
-public class BaseUnit {
+public class Unit {
 
     private int id;
 
@@ -22,14 +22,14 @@ public class BaseUnit {
     @Email(message = "Email should be valid")
     private String email;
 
-    public BaseUnit() {
+    public Unit() {
     }
 
-    public BaseUnit(int id,
-                    int age,
-                    String name,
-                    String surname,
-                    String email) {
+    public Unit(int id,
+                int age,
+                String name,
+                String surname,
+                String email) {
         this.id = id;
         this.age = age;
         this.name = name;
